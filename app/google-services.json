@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "738982097966",
+    "firebase_url": "https://geostatus-f6e94.firebaseio.com",
+    "project_id": "geostatus-f6e94",
+    "storage_bucket": "geostatus-f6e94.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:738982097966:android:f16c6d92772c69a7",
+        "android_client_info": {
+          "package_name": "com.m2brcorp.geostatus"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "738982097966-g81ap1ecqsnvrkh8ac2jipvsk7no6pp4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBcAEHeekn7FGCuJ_GgSC3zyOisz2doneM"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

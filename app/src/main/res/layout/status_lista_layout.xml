@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="120px">
+
+    <TextView
+        android:text="TextView"
+        android:layout_height="wrap_content"
+        android:id="@+id/statusLimpeza"
+        android:layout_weight="1"
+        android:textStyle="normal|bold"
+        android:textColor="#000"
+        android:textAlignment="textStart"
+        android:layout_width="150dp"
+        android:fontFamily="sans-serif-condensed" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dataLimpeza"
+        android:layout_weight="1"
+        android:textColor="#000"
+        android:textStyle="normal|bold"
+        android:textAlignment="textStart"
+        android:fontFamily="sans-serif-condensed" />
+    <TextView
+        android:text="às"
+        android:layout_width="5px"
+        android:layout_height="wrap_content"
+        android:id="@+id/as"
+        android:textColor="#000"
+        android:layout_weight="1"
+        android:textStyle="normal|bold" />
+
+    <TextView
+        android:text="TextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/horaLimpeza"
+        android:layout_weight="1"
+        android:textColor="#000"
+        android:textStyle="normal|bold"
+        android:textAlignment="center" />
+</LinearLayout>
