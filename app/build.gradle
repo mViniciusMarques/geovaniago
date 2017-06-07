@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-apply plugin: 'com.google.firebase.firebase-perf'
 
 android {
     compileSdkVersion 24
@@ -56,7 +55,6 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.mobsandgeeks:android-saripaar:2.0.2'
     compile 'com.irozon.sneaker:sneaker:1.0.0'
-
 }
 
 apply plugin: 'com.google.gms.google-services'

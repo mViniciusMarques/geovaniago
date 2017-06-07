@@ -82,7 +82,8 @@ public class MasculinoActivity extends AppCompatActivity {
                     fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
                     isLimpando = Boolean.TRUE;
                     selectorBotoes(isLimpando);
-                    gerarNotificacao();
+                    //gerarNotificacao();
+               // recuperarStatus();
             }
         });
     }
@@ -96,7 +97,8 @@ public class MasculinoActivity extends AppCompatActivity {
                     fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
                     isLimpando = Boolean.FALSE;
                     selectorBotoes(isLimpando);
-                    gerarNotificacao();
+                    //gerarNotificacao();
+             //   recuperarStatus();
             }
         });
     }
@@ -142,14 +144,16 @@ public class MasculinoActivity extends AppCompatActivity {
         fire.getFirebaseContextReference().child("Masc").child("Status").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                for (DataSnapshot ds :dataSnapshot.getChildren()) {
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     Log.i("GEMMA", ds.getValue().toString());
-                        String status = (String) ds.child("status").getValue();
-                        String data = (String) ds.child("data").getValue();
-                        String hora = (String) ds.child("hora").getValue();
-                    statuses.add(new Status(status,data,hora));
-                    recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
+                    String status = (String) ds.child("status").getValue();
+                    String data = (String) ds.child("data").getValue();
+                    String hora = (String) ds.child("hora").getValue();
+                    statuses.add(new Status(status, data, hora));
+                    StatusAdapter statusAdapter = new StatusAdapter(getApplicationContext(), statuses);
+                    recyclerView.setAdapter(statusAdapter);
                     progressDialog.dismiss();
+                    //statusAdapter.notifyDataSetChanged();
                 }
             }
 
@@ -205,5 +209,6 @@ public class MasculinoActivity extends AppCompatActivity {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(00, builder.build());
     }
+
 
 }

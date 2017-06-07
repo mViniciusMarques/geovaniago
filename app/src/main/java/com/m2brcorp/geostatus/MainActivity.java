@@ -2,25 +2,17 @@ package com.m2brcorp.geostatus;
 
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.ProgressDialog;
-import android.app.TaskStackBuilder;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
-import android.support.v7.view.menu.ExpandedMenuView;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -35,14 +27,8 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
-import com.irozon.sneaker.Sneaker;
-import com.m2brcorp.geostatus.Adapter.StatusAdapter;
-import com.m2brcorp.geostatus.Domain.Status;
 import com.m2brcorp.geostatus.Enum.GeneroEnum;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import universum.studios.android.transition.WindowTransitions;
 
@@ -208,6 +194,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void recuperarAvisoPorGenero(){
+        progressDialog.setMessage("Por favor aguarde...");
+        progressDialog.show();
+
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -219,11 +208,12 @@ public class MainActivity extends AppCompatActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             String s = dataSnapshot.child("AvisoFeminino").getValue().toString();
                             campoAviso.setText(s);
+
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            Toast.makeText(getApplicationContext(),"Verifique sua conexão com a internet",Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -234,11 +224,12 @@ public class MainActivity extends AppCompatActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             String s = dataSnapshot.child("AvisoMasculino").getValue().toString();
                             campoAviso.setText(s);
+                            progressDialog.dismiss();
                         }
 
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
-
+                            Toast.makeText(getApplicationContext(),"Verifique sua conexão com a internet",Toast.LENGTH_SHORT).show();
                         }
                     });
 
@@ -260,7 +251,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (getAutenticateUser().equalsIgnoreCase("mulheres@stefanini.com")) {
             fire.setReferencedSon("Aviso");
-            fire.getFirebaseContextReference().addListenerForSingleValueEvent(new ValueEventListener() {
+            fire.getFirebaseContextReference().addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String s = dataSnapshot.child("AvisoFeminino").getValue().toString();
@@ -270,13 +261,13 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
+                    Toast.makeText(getApplicationContext(),"Verifique sua conexão com a internet",Toast.LENGTH_SHORT).show();
                 }
             });
 
         } else if (getAutenticateUser().equals("homens@stefanini.com")) {
             fire.setReferencedSon("Aviso");
-            fire.getFirebaseContextReference().addListenerForSingleValueEvent(new ValueEventListener() {
+            fire.getFirebaseContextReference().addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     String s = dataSnapshot.child("AvisoMasculino").getValue().toString();
@@ -286,12 +277,13 @@ public class MainActivity extends AppCompatActivity {
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
+                    Toast.makeText(getApplicationContext(),"Verifique sua conexão com a internet",Toast.LENGTH_SHORT).show();
                 }
             });
         }
 
     }
+
 
 //    public void testezim(){
     //https://android-arsenal.com/details/1/5806
