@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -69,27 +70,37 @@ public class FemininoActivity extends AppCompatActivity {
     }
 
     private void acionarBotaoLimpo() {
-        limpo.setOnClickListener(new View.OnClickListener() {
+        limpo.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                fire.setReferencedSon("Banheiro");
-                fire.getFirebaseContextReference().child("Feminino").setValue("false");
-                fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
-                isLimpando = Boolean.TRUE;
-                selectorBotoes(isLimpando);
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    fire.setReferencedSon("Banheiro");
+                    fire.getFirebaseContextReference().child("Feminino").setValue(Boolean.FALSE);
+                    fire.getFirebaseContextReference().child("Feminino1").setValue(Boolean.FALSE);
+                    fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
+                    isLimpando = Boolean.TRUE;
+                    selectorBotoes(isLimpando);
+                    return true;
+                }
+                return false;
             }
         });
     }
 
     private void acionarBotaoLimpando() {
-        limpando.setOnClickListener(new View.OnClickListener() {
+        limpando.setOnTouchListener(new View.OnTouchListener() {
             @Override
-            public void onClick(View v) {
-                fire.setReferencedSon("Banheiro");
-                fire.getFirebaseContextReference().child("Feminino").setValue("true");
-                fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
-                isLimpando = Boolean.FALSE;
-                selectorBotoes(isLimpando);
+            public boolean onTouch(View v, MotionEvent event) {
+                if(event.getAction() == MotionEvent.ACTION_DOWN) {
+                    fire.setReferencedSon("Banheiro");
+                    fire.getFirebaseContextReference().child("Feminino").setValue(Boolean.TRUE);
+                    fire.getFirebaseContextReference().child("Feminino1").setValue(Boolean.TRUE);
+                    fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
+                    isLimpando = Boolean.FALSE;
+                    selectorBotoes(isLimpando);
+                    return true;
+                }
+                return false;
             }
         });
     }
@@ -164,13 +175,12 @@ public class FemininoActivity extends AppCompatActivity {
 
     public void recuperarStatusBotao(){
         fire.setReferencedSon("Banheiro");
-        fire.getFirebaseContextReference().child("Feminino").addValueEventListener(new ValueEventListener() {
+        fire.getFirebaseContextReference().child("Feminino1").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.i("BAVARIO", dataSnapshot.getValue().toString());
-                String s =  (String) dataSnapshot.getValue();
-                isLimpando = Boolean.valueOf(s);
-                selectorBotoes(isLimpando);
+                boolean b = (Boolean) dataSnapshot.getValue();
+                selectorBotoes(b);
             }
 
             @Override
