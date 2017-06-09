@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageButton;
 
 import com.google.firebase.auth.FirebaseUser;
@@ -39,6 +40,9 @@ public class FemininoActivity extends AppCompatActivity {
     Boolean isLimpando = false;
     Status status1;
 
+    private Button limpoMulheres;
+    private Button limpandoMulheres;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +59,9 @@ public class FemininoActivity extends AppCompatActivity {
         limpando = (ImageButton) findViewById(R.id.imageButtonLimpando);
         limpo = (ImageButton) findViewById(R.id.imageButtonLiberado);
 
+        limpoMulheres = (Button) findViewById(R.id.btn_limpo_mulheres);
+        limpandoMulheres = (Button) findViewById(R.id.btn_limpando_mulheres);
+
         recyclerView = (RecyclerView) findViewById(R.id.recycleviewFeminino);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
@@ -64,8 +71,12 @@ public class FemininoActivity extends AppCompatActivity {
         recuperarStatus();
         //hselectorBotoes(isLimpando);
 
-        acionarBotaoLimpando();
-        acionarBotaoLimpo();
+       // acionarBotaoLimpando();
+       // acionarBotaoLimpo();
+
+        acionarLimpoMulheres();
+        acionarLimpandoMulheres();
+        esconderEmbaixoDoTapete();
 
     }
 
@@ -186,6 +197,37 @@ public class FemininoActivity extends AppCompatActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+    }
+
+    private void esconderEmbaixoDoTapete(){
+        if(!getAutenticateUser().equalsIgnoreCase("geovania@stefanini.com")){
+            limpoMulheres.setVisibility(View.GONE);
+            limpandoMulheres.setVisibility(View.GONE);
+        }
+    }
+
+    private void acionarLimpoMulheres(){
+        limpoMulheres.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fire.getFirebaseContextReference().child("Feminino1").setValue(Boolean.FALSE);
+                fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
+                isLimpando = Boolean.FALSE;
+                selectorBotoes(isLimpando);
+            }
+        });
+    }
+
+    private void acionarLimpandoMulheres(){
+        limpandoMulheres.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                fire.getFirebaseContextReference().child("Feminino1").setValue(Boolean.TRUE);
+                fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
+                isLimpando = Boolean.TRUE;
+                selectorBotoes(isLimpando);
             }
         });
     }
