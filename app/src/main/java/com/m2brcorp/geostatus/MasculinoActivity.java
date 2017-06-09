@@ -15,7 +15,10 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -78,10 +81,10 @@ public class MasculinoActivity extends AppCompatActivity {
 
         testeTrigger();
         testeTrigger2();
+        esconderEmbaixoDoTapete();
 
         acionarBotaoLimpando();
         acionarBotaoLimpo();
-
     }
 
     private void acionarBotaoLimpo() {
@@ -123,6 +126,10 @@ public class MasculinoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 fire.getFirebaseContextReference().child("Masculino1").setValue(Boolean.FALSE);
+                fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
+                isLimpando = Boolean.FALSE;
+                selectorBotoes(isLimpando);
+               // recuperarStatusBotao();
             }
         });
     }
@@ -131,6 +138,10 @@ public class MasculinoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 fire.getFirebaseContextReference().child("Masculino1").setValue(Boolean.TRUE);
+                fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
+                isLimpando = Boolean.TRUE;
+                selectorBotoes(isLimpando);
+               // recuperarStatusBotao();
             }
         });
     }
@@ -159,8 +170,10 @@ public class MasculinoActivity extends AppCompatActivity {
         return getAutenticateUser().equalsIgnoreCase(FLAG_TO_EDITOR);
     }
 
+    /*usuario geovania bloqueado temporariamente
+            para estes botoes*/
     public void blockButtons(){
-        if(!hasPermissionToEdit()){
+        if(!hasPermissionToEdit() || getAutenticateUser().equalsIgnoreCase("geovania@stefanini.com")){
             limpo.setEnabled(Boolean.FALSE);
             limpando.setEnabled(Boolean.FALSE);
         }
@@ -194,6 +207,9 @@ public class MasculinoActivity extends AppCompatActivity {
         });
     }
 
+   /* Metodo responsavel por alterar a visibilidade
+    *intercalando os botões sobrepostos
+    */
     public void selectorBotoes(Boolean isLimpando){
         if(isLimpando){
             limpando.setVisibility(View.VISIBLE);
@@ -204,9 +220,16 @@ public class MasculinoActivity extends AppCompatActivity {
         }
     }
 
+    private void esconderEmbaixoDoTapete(){
+        if(!getAutenticateUser().equalsIgnoreCase("geovania@stefanini.com")){
+            botaoTeste.setVisibility(View.GONE);
+            botaoTeste3.setVisibility(View.GONE);
+        }
+    }
+
     public void recuperarStatusBotao(){
         fire.setReferencedSon("Banheiro");
-        fire.getFirebaseContextReference().child("Masculino").addValueEventListener(new ValueEventListener() {
+        fire.getFirebaseContextReference().child("Masculino1").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.i("BAVARIO", dataSnapshot.getValue().toString());
@@ -238,5 +261,7 @@ public class MasculinoActivity extends AppCompatActivity {
         NotificationManager manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
         manager.notify(00, builder.build());
     }
+
+
 
 }
