@@ -28,6 +28,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.m2brcorp.geostatus.Enum.GeneroEnum;
+import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
 
 import universum.studios.android.transition.WindowTransitions;
@@ -109,6 +110,8 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+
+
     private void exibicaoCaixaAviso() {
         if(hasPermissionToEdit()){
             recuperarAvisoPorGenero();
@@ -151,15 +154,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private String getAutenticateUser(){
-        FirebaseUser user = fire.getFirebaseAuthReference().getCurrentUser();
-        Log.i("SIMPSONS",user.getEmail());
-        return user.getEmail();
+        if(NetworkUtils.isOnline(this)) {
+            FirebaseUser user = fire.getFirebaseAuthReference().getCurrentUser();
+            Log.i("SIMPSONS", user.getEmail());
+            return user.getEmail();
+        }
+        return "";
     }
 
     public Boolean hasPermissionToEdit(){
         return getAutenticateUser().equalsIgnoreCase(FLAG_TO_EDITOR);
     }
 
+    //metodo resposavel por popular combo de genero
     public void selectItem(){
         spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -180,10 +187,10 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 fire.setReferencedSon("Aviso");
-                if(generoSelecionado.equalsIgnoreCase("feminino")) {
+                if(generoSelecionado.equalsIgnoreCase("feminino") && NetworkUtils.isOnline(v.getContext())) {
                     fire.getFirebaseContextReference().child("AvisoFeminino").setValue(campoAviso.getText().toString());
                     Toast.makeText(v.getContext(),"Meninas avisadas com sucesso",Toast.LENGTH_SHORT).show();
-                }else if(generoSelecionado.equalsIgnoreCase("masculino")){
+                }else if(generoSelecionado.equalsIgnoreCase("masculino") && NetworkUtils.isOnline(v.getContext())){
                     fire.getFirebaseContextReference().child("AvisoMasculino").setValue(campoAviso.getText().toString());
                     Toast.makeText(v.getContext(),"Meninos avisados com sucesso",Toast.LENGTH_SHORT).show();
                 }else{
@@ -201,7 +208,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 generoSelecionado = parent.getItemAtPosition(position).toString();
-                if(generoSelecionado.equalsIgnoreCase("feminino")) {
+                if(generoSelecionado.equalsIgnoreCase("feminino") && NetworkUtils.isOnline(view.getContext())) {
                     fire.setReferencedSon("Aviso");
                     fire.getFirebaseContextReference().addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -217,7 +224,7 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
-                }else if(generoSelecionado.equalsIgnoreCase("masculino")){
+                }else if(generoSelecionado.equalsIgnoreCase("masculino") && NetworkUtils.isOnline(view.getContext())){
                     fire.setReferencedSon("Aviso");
                     fire.getFirebaseContextReference().addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -249,7 +256,7 @@ public class MainActivity extends AppCompatActivity {
         progressDialog.setMessage("Por favor aguarde...");
         progressDialog.show();
 
-        if (getAutenticateUser().equalsIgnoreCase("mulheres@stefanini.com")) {
+        if (getAutenticateUser().equalsIgnoreCase("mulheres@stefanini.com") && NetworkUtils.isOnline(this)) {
             fire.setReferencedSon("Aviso");
             fire.getFirebaseContextReference().addValueEventListener(new ValueEventListener() {
                 @Override
@@ -265,7 +272,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             });
 
-        } else if (getAutenticateUser().equals("homens@stefanini.com")) {
+        } else if (getAutenticateUser().equals("homens@stefanini.com") && NetworkUtils.isOnline(this)) {
             fire.setReferencedSon("Aviso");
             fire.getFirebaseContextReference().addValueEventListener(new ValueEventListener() {
                 @Override

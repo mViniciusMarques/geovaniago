@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.m2brcorp.geostatus.Adapter.StatusAdapter;
 import com.m2brcorp.geostatus.Domain.Status;
 import com.m2brcorp.geostatus.Util.DataHoraUtils;
+import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
 
 import java.util.ArrayList;
@@ -125,11 +126,15 @@ public class MasculinoActivity extends AppCompatActivity {
         botaoTeste.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fire.getFirebaseContextReference().child("Masculino1").setValue(Boolean.FALSE);
-                fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
-                isLimpando = Boolean.FALSE;
-                selectorBotoes(isLimpando);
-               // recuperarStatusBotao();
+                if (NetworkUtils.isOnline(v.getContext())) {
+                    fire.getFirebaseContextReference().child("Masculino1").setValue(Boolean.FALSE);
+                    fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
+                    isLimpando = Boolean.FALSE;
+                    selectorBotoes(isLimpando);
+                    // recuperarStatusBotao();
+                }else{
+                    Toast.makeText(v.getContext(),"Verifique sua conexão com a internet", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -137,11 +142,15 @@ public class MasculinoActivity extends AppCompatActivity {
         botaoTeste3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                fire.getFirebaseContextReference().child("Masculino1").setValue(Boolean.TRUE);
-                fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
-                isLimpando = Boolean.TRUE;
-                selectorBotoes(isLimpando);
-               // recuperarStatusBotao();
+                if (NetworkUtils.isOnline(v.getContext())) {
+                    fire.getFirebaseContextReference().child("Masculino1").setValue(Boolean.TRUE);
+                    fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
+                    isLimpando = Boolean.TRUE;
+                    selectorBotoes(isLimpando);
+                    // recuperarStatusBotao();
+                }else{
+                    Toast.makeText(v.getContext(),"Verifique sua conexão com a internet", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
@@ -161,9 +170,12 @@ public class MasculinoActivity extends AppCompatActivity {
     }
 
     private String getAutenticateUser(){
-        FirebaseUser user = fire.getFirebaseAuthReference().getCurrentUser();
-        Log.i("SIMPSONS",user.getEmail());
-        return user.getEmail();
+        if (NetworkUtils.isOnline(this)) {
+            FirebaseUser user = fire.getFirebaseAuthReference().getCurrentUser();
+            Log.i("SIMPSONS", user.getEmail());
+            return user.getEmail();
+        }
+        return "";
     }
 
     public Boolean hasPermissionToEdit(){

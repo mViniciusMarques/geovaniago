@@ -19,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.m2brcorp.geostatus.Adapter.StatusAdapter;
 import com.m2brcorp.geostatus.Domain.Status;
 import com.m2brcorp.geostatus.Util.DataHoraUtils;
+import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
 
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ public class FemininoActivity extends AppCompatActivity {
     Boolean isLimpando = false;
     Status status1;
 
+    NetworkUtils networkUtils;
     private Button limpoMulheres;
     private Button limpandoMulheres;
 
