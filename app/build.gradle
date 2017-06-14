@@ -16,8 +16,8 @@ android {
         applicationId "com.m2brcorp.geostatus"
         minSdkVersion 14
         targetSdkVersion 24
-        versionCode 6
-        versionName "1.4"
+        versionCode 7
+        versionName "1.5"
         multiDexEnabled = true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
