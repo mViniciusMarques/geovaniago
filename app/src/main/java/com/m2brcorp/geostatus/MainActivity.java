@@ -18,6 +18,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -28,8 +29,11 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.m2brcorp.geostatus.Enum.GeneroEnum;
+import com.m2brcorp.geostatus.Util.DataHoraUtils;
 import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
+
+import java.util.Date;
 
 import universum.studios.android.transition.WindowTransitions;
 
@@ -48,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     Spinner spinner;
     Button salvar;
     EditText campoAviso;
+    TextView txtCafe;
+    ImageView btnCafe;
 
     private ReferenceFB fire;
     Activity activity = null;
@@ -70,19 +76,30 @@ public class MainActivity extends AppCompatActivity {
         pref = getApplicationContext().getSharedPreferences("Autenticator", MODE_PRIVATE);
 
         lblAviso = (TextView) findViewById(R.id.lblAviso);
+        txtCafe = (TextView) findViewById(R.id.textView6);
+
         masculino = (ImageButton) findViewById(R.id.imageView3);
         feminino = (ImageButton) findViewById(R.id.imageView4);
         sair = (ImageButton) findViewById(R.id.imageButtonSair);
+        btnCafe = (ImageView) findViewById(R.id.imageView8);
 
         spinner = (Spinner) findViewById(R.id.spinner);
         salvar = (Button) findViewById(R.id.button4);
         campoAviso = (EditText) findViewById(R.id.editText4);
+
         verificarVisibilidade();
         getGeneroDescricao();
         selectItem();
         persistirAviso();
         exibicaoCaixaAviso();
 
+        navegarEntreTelas();
+        atualizarStatusCafe();
+        recuperarStatusTextoCafe();
+
+    }
+
+    private void navegarEntreTelas() {
         masculino.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -107,10 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(new Intent(v.getContext(),LoginActivity.class));
             }
         });
-
     }
-
-
 
     private void exibicaoCaixaAviso() {
         if(hasPermissionToEdit()){
@@ -148,8 +162,11 @@ public class MainActivity extends AppCompatActivity {
             salvar.setVisibility(View.GONE);
             campoAviso.setEnabled(Boolean.FALSE);
             lblAviso.setVisibility(View.VISIBLE);
+            btnCafe.setEnabled(Boolean.FALSE);
         }else{
             lblAviso.setVisibility(View.GONE);
+            txtCafe.setY(100F);
+            btnCafe.setY(100F);
         }
     }
 
@@ -289,6 +306,42 @@ public class MainActivity extends AppCompatActivity {
             });
         }
 
+    }
+
+    private void atualizarStatusCafe(){
+        btnCafe.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                if(NetworkUtils.isOnline(getApplicationContext())) {
+                    fire.setReferencedSon("Cafe");
+                    fire.getFirebaseContextReference().child("Status_Cafe").setValue(DataHoraUtils.dataHoraFormatada(new Date()));
+                    txtCafe.setText(DataHoraUtils.dataHoraFormatada(new Date()));
+                    return true;
+                }else{
+                    Toast.makeText(getApplicationContext(),"Sem conexão com a internet",Toast.LENGTH_SHORT).show();
+                    return false;
+                }
+            }
+        });
+    }
+
+    private void recuperarStatusTextoCafe(){
+        fire.setReferencedSon("Cafe");
+        fire.getFirebaseContextReference().child("Status_Cafe").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(NetworkUtils.isOnline(getApplicationContext())) {
+                    txtCafe.setText(dataSnapshot.getValue().toString());
+                }else{
+                    Toast.makeText(getApplicationContext(),"Sem conexão com a internet",Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 

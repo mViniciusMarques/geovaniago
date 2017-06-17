@@ -17,6 +17,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CompoundButton;
 import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
 
@@ -40,14 +42,15 @@ public class MasculinoActivity extends AppCompatActivity {
 
     public static final String FLAG_TO_EDITOR = "geovania@stefanini.com";
     private ProgressDialog progressDialog;
-    Button limpando;
-    Button limpo;
     protected RecyclerView recyclerView;
     protected List<Status> statuses;
     Activity activity = null;
     private ReferenceFB fire;
     Boolean isLimpando = false;
     Status status1;
+
+    Button limpando;
+    Button limpo;
     Button botaoTeste;
     Button botaoTeste3;
 

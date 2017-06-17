@@ -19,4 +19,9 @@ public class DataHoraUtils {
         return sdf.format(date);
     }
 
+    public static String dataHoraFormatada(Date date){
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM" +" - "+ "hh:mm");
+        return sdf.format(date);
+    }
+
 }
