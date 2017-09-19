@@ -216,6 +216,12 @@ public class FemininoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 fire.getFirebaseContextReference().child("Feminino1").setValue(Boolean.FALSE);
                 fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
+
+                recyclerView.invalidate();
+                recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
+                statuses.clear();
+                recuperarStatus();
+
                 isLimpando = Boolean.FALSE;
                 selectorBotoes(isLimpando);
             }
@@ -228,6 +234,12 @@ public class FemininoActivity extends AppCompatActivity {
             public void onClick(View v) {
                 fire.getFirebaseContextReference().child("Feminino1").setValue(Boolean.TRUE);
                 fire.getFirebaseContextReference().child("Fem").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
+
+                recyclerView.invalidate();
+                recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
+                statuses.clear();
+                recuperarStatus();
+
                 isLimpando = Boolean.TRUE;
                 selectorBotoes(isLimpando);
             }

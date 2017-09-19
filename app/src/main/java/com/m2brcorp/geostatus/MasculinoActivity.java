@@ -134,7 +134,10 @@ public class MasculinoActivity extends AppCompatActivity {
                     fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpo"));
                     isLimpando = Boolean.FALSE;
                     selectorBotoes(isLimpando);
-                    // recuperarStatusBotao();
+                    recyclerView.invalidate();
+                    recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
+                    statuses.clear();
+                    recuperarStatus();
                 }else{
                     Toast.makeText(v.getContext(),"Verifique sua conexão com a internet", Toast.LENGTH_SHORT).show();
                 }
@@ -150,7 +153,10 @@ public class MasculinoActivity extends AppCompatActivity {
                     fire.getFirebaseContextReference().child("Masc").child("Status").push().setValue(persistirStatus("Banheiro Limpando"));
                     isLimpando = Boolean.TRUE;
                     selectorBotoes(isLimpando);
-                    // recuperarStatusBotao();
+                    recyclerView.invalidate();
+                    recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
+                    statuses.clear();
+                    recuperarStatus();
                 }else{
                     Toast.makeText(v.getContext(),"Verifique sua conexão com a internet", Toast.LENGTH_SHORT).show();
                 }
@@ -205,14 +211,18 @@ public class MasculinoActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds :dataSnapshot.getChildren()) {
-                    Log.i("GEMMA", ds.getValue().toString());
                         String status = (String) ds.child("status").getValue();
                         String data = (String) ds.child("data").getValue();
                         String hora = (String) ds.child("hora").getValue();
-                    statuses.add(new Status(status,data,hora));
-                    recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
+                        inserirRegistroNaLista(status, data, hora);
                     progressDialog.dismiss();
                 }
+            }
+
+            private void inserirRegistroNaLista(String status, String data, String hora) {
+                statuses.add(new Status(status,data,hora));
+                recyclerView.invalidate();
+                recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
             }
 
             @Override
@@ -226,6 +236,7 @@ public class MasculinoActivity extends AppCompatActivity {
     *intercalando os botões sobrepostos
     */
     public void selectorBotoes(Boolean isLimpando){
+        recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
         if(isLimpando){
             limpando.setVisibility(View.VISIBLE);
             limpo.setVisibility(View.GONE);
