@@ -23,6 +23,7 @@ import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -155,7 +156,10 @@ public class FemininoActivity extends AppCompatActivity {
         progressDialog.show();
 
         fire.setReferencedSon("Banheiro");
-        fire.getFirebaseContextReference().child("Fem").child("Status").addListenerForSingleValueEvent(new ValueEventListener() {
+        fire.getFirebaseContextReference().child("Fem")
+                                          .child("Status")
+                                       //   .orderByChild("data")
+                                          .addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot ds :dataSnapshot.getChildren()) {
@@ -164,6 +168,7 @@ public class FemininoActivity extends AppCompatActivity {
                     String data = (String) ds.child("data").getValue();
                     String hora = (String) ds.child("hora").getValue();
                     statuses.add(new Status(status,data,hora));
+                   // Collections.reverse(statuses);
                     recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
                     progressDialog.dismiss();
                 }

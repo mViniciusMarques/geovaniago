@@ -16,11 +16,15 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.m2brcorp.geostatus.Core.App;
 import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
 import com.mobsandgeeks.saripaar.annotation.Email;
 import com.mobsandgeeks.saripaar.annotation.NotEmpty;
 import com.mobsandgeeks.saripaar.annotation.Password;
+import com.parse.LogInCallback;
+import com.parse.ParseException;
+import com.parse.ParseUser;
 
 import butterknife.ButterKnife;
 
@@ -54,11 +58,12 @@ public class LoginActivity extends AppCompatActivity {
 
         pref = getApplicationContext().getSharedPreferences("Autenticator", MODE_PRIVATE);
 
-        btnEntrar = (ImageButton) findViewById(R.id.imageButton45);
-        login = (EditText) findViewById(R.id.editText2);
-        senha  = (EditText) findViewById(R.id.editText3);
+        btnEntrar = findViewById(R.id.imageButton45);
+        login = findViewById(R.id.editText2);
+        senha  = findViewById(R.id.editText3);
         recuperarSessao();
-        doLogin();
+      //  doLogin();
+        acaoBotaoLogar();
     }
 
     public void doLogin() {
@@ -108,12 +113,53 @@ public class LoginActivity extends AppCompatActivity {
         if(isLogado != null && isLogado == true){
             startActivity(new Intent(getApplicationContext(), MainActivity.class));
         }
-        Log.i("mimimimimimimimi",isLogado.toString());
     }
 
     @Override
     public void onBackPressed() {
         super.onBackPressed();
         startActivity(new Intent(this, LoginActivity.class));
+    }
+
+    private void acaoBotaoLogar() {
+        btnEntrar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                iniciarLogin();
+            }
+        });
+    }
+
+    private void iniciarLogin() {
+        progressDialog.setMessage(getString(R.string.MSG_AGUARDE));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        if (NetworkUtils.isOnline(this)) {
+            if (!TextUtils.isEmpty(login.getText().toString().trim()) || !TextUtils.isEmpty(senha.getText().toString().trim())) {
+                executarLoginRemoto();
+            } else {
+                Toast.makeText(this, R.string.MSG_USR_SENHA, Toast.LENGTH_SHORT).show();
+                progressDialog.dismiss();
+            }
+        } else {
+            Toast.makeText(this , R.string.MSG_SEM_CONEXAO, Toast.LENGTH_SHORT).show();
+            progressDialog.dismiss();
+        }
+    }
+
+    private void executarLoginRemoto() {
+        ParseUser.logInInBackground(login.getText().toString().trim(), senha.getText().toString().trim(), new LogInCallback() {
+            public void done(ParseUser user, ParseException e) {
+                if (user != null) {
+                    persistirSessao();
+                    progressDialog.dismiss();
+                    startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                } else {
+                    Log.e("ERRO_PARSER", e.getMessage());
+                    Toast.makeText(getApplicationContext(), R.string.MSG_USR_INVALIDO, Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            }
+        });
     }
 }

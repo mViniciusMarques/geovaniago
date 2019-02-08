@@ -3,4 +3,12 @@
     <string name="txt_escolha_wc">Escolha qual WC que deseja consultar o status.</string>
     <string name="title_activity_login">LoginActivity</string>
     <string name="editor">geovania@stefanini.com</string>
+    <string name="PARSE_APPLICATION_ID">9b9NNBpyQQUwSX0aeKRoSWokL0bKYn9w0IeuXxjk</string>
+    <string name="PARSE_CLIENT_ID">DFzzaCMsNeQ2CpqI84mf0Q9DYyNO0j16EgKGcp5E</string>
+    <string name="PARSE_SERVER_BACK4APP">https://parseapi.back4app.com/</string>
+    <string name="MSG_AGUARDE">Por favor, aguarde...</string>
+    <string name="MSG_USR_SENHA">Preencha os campos usuários e senha</string>
+    <string name="MSG_SEM_CONEXAO">Sem conexaõ com a Internet</string>
+    <string name="MSG_USR_INVALIDO">Senha ou usuários inválidos</string>
+    <string name="EMAIL_ADMINISTRADOR">geovania@stefanini.com</string>
 </resources>

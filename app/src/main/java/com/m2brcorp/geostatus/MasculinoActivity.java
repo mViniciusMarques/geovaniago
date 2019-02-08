@@ -7,35 +7,39 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.app.NotificationCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.ToggleButton;
 
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 import com.m2brcorp.geostatus.Adapter.StatusAdapter;
+import com.m2brcorp.geostatus.Core.ParseAuthUtils;
 import com.m2brcorp.geostatus.Domain.Status;
 import com.m2brcorp.geostatus.Util.DataHoraUtils;
 import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
+import com.parse.FindCallback;
+import com.parse.GetCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import bolts.Continuation;
+import bolts.Task;
 import universum.studios.android.transition.WindowTransitions;
 
 public class MasculinoActivity extends AppCompatActivity {
@@ -68,27 +72,30 @@ public class MasculinoActivity extends AppCompatActivity {
 
         getSupportActionBar().hide();
 
-        limpando = (Button) findViewById(R.id.imageButton3);
-        limpo = (Button) findViewById(R.id.imageButton2);
+        limpando = findViewById(R.id.imageButton3);
+        limpo = findViewById(R.id.imageButton2);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recyclevieww);
+        recyclerView = findViewById(R.id.recyclevieww);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        botaoTeste = (Button) findViewById(R.id.button2);
-        botaoTeste3 = (Button) findViewById(R.id.button3);
+        botaoTeste = findViewById(R.id.button2);
+        botaoTeste3 = findViewById(R.id.button3);
 
         getAutenticateUser();
         recuperarStatusBotao();
-        blockButtons();
-        recuperarStatus();
+       // blockButtons();
+       // recuperarStatus();
         //hselectorBotoes(isLimpando);
 
-        testeTrigger();
-        testeTrigger2();
+      //  testeTrigger();
+       // testeTrigger2();
         esconderEmbaixoDoTapete();
 
         acionarBotaoLimpando();
-        acionarBotaoLimpo();
+       // acionarBotaoLimpo();
+        acionarAcaoBanheiroLimpando();
+        obterMovimentacoesBanheiro();
+        desabilitarBotoesParaUsuariosComuns();
     }
 
     private void acionarBotaoLimpo() {
@@ -180,9 +187,7 @@ public class MasculinoActivity extends AppCompatActivity {
 
     private String getAutenticateUser(){
         if (NetworkUtils.isOnline(this)) {
-            FirebaseUser user = fire.getFirebaseAuthReference().getCurrentUser();
-            Log.i("SIMPSONS", user.getEmail());
-            return user.getEmail();
+         return ParseAuthUtils.obterUsuarioLogado().getEmail();
         }
         return "";
     }
@@ -273,7 +278,7 @@ public class MasculinoActivity extends AppCompatActivity {
     public void gerarNotificacao(){
         long[] padrao = {0, 100, 1000,100,1000};
         NotificationCompat.Builder builder =
-                (NotificationCompat.Builder) new NotificationCompat.Builder(this)
+                new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.men_p)
                         .setVibrate(padrao)
                         .setContentTitle("Atenção")
@@ -288,6 +293,102 @@ public class MasculinoActivity extends AppCompatActivity {
         manager.notify(00, builder.build());
     }
 
+    private void cadastrarAcaoBanheiro(String descricao, final boolean estado) {
+        ParseObject banheiroParse = new ParseObject("Banheiro");
+        banheiroParse.put("grupo", "M".trim());
+        banheiroParse.put("descricao", descricao);
+        banheiroParse.put("data", new Date());
+        banheiroParse.put("ativo", false);
+        banheiroParse.saveInBackground().onSuccess(new Continuation<Void, Object>() {
+            @Override
+            public Object then(Task<Void> task) {
+                mudarEstadoBanheiro(estado);
+                return null;
+            }
+        });
+    }
 
+    private void mudarEstadoBanheiro(final Boolean estado) {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Estado");
+        query.getInBackground("AJ2HmyA2Yq", new GetCallback<ParseObject>() {
+            public void done(ParseObject gameScore, ParseException e) {
+                if (e == null) {
+                    gameScore.put("ativo", estado);
+                    gameScore.saveInBackground();
+                }
+            }
+        });
+    }
+
+    private void recuperarEstadoBanheiro() {
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Estado");
+        query.getInBackground("AJ2HmyA2Yq", new GetCallback<ParseObject>() {
+            public void done(ParseObject object, ParseException e) {
+                if (e == null) {
+                    selectorBotoes(object.getBoolean("ativo"));
+                } else {
+                   Log.e("Estado_dos_botoes", e.getMessage());
+                }
+            }
+        });
+    }
+
+    private void desabilitarBotoesParaUsuariosComuns() {
+        if(!ParseAuthUtils.obterUsuarioLogado().getEmail().equalsIgnoreCase(getString(R.string.EMAIL_ADMINISTRADOR))){
+            botaoTeste.setVisibility(View.GONE);
+            botaoTeste3.setVisibility(View.GONE);
+        }
+    }
+
+    private void obterMovimentacoesBanheiro() {
+        progressDialog.setMessage(getString(R.string.MSG_AGUARDE));
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+
+        ParseQuery<ParseObject> query = ParseQuery.getQuery("Banheiro");
+          query.whereEqualTo("grupo", "M");
+          query.orderByDescending("createdAt");
+        query.setLimit(10);
+        query.findInBackground(new FindCallback<ParseObject>() {
+                 @Override
+                 public void done(List<ParseObject> objects, ParseException e) {
+                     for (ParseObject retorno : objects ) {
+                         Status estadoAtual = new Status();
+                         DateFormat dataFormatada = new SimpleDateFormat("dd/MM/yyyy");
+                         DateFormat horaFormatada = new SimpleDateFormat("HH:mm:ss");
+
+
+                         estadoAtual.setStatus(retorno.getString("descricao"));
+                         estadoAtual.setData( dataFormatada.format(retorno.getCreatedAt()) );
+                         estadoAtual.setHora( horaFormatada.format(retorno.getCreatedAt()) );
+
+                         statuses.add(estadoAtual);
+                         recyclerView.invalidate();
+                         recyclerView.setAdapter(new StatusAdapter(getApplicationContext(), statuses));
+                         Log.d("CHORAO", String.valueOf(retorno));
+                     }
+                     progressDialog.dismiss();
+                 }
+             });
+
+    }
+
+    private void acionarAcaoBanheiroLimpando() {
+        botaoTeste.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cadastrarAcaoBanheiro("Limpando banheiro masculino", false);
+            }
+        });
+    }
+
+    private void acionarAcaoBanheiroLimpo() {
+        botaoTeste3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                cadastrarAcaoBanheiro("Banheiro masculino limpo.", true);
+            }
+        });
+    }
 
 }

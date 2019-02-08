@@ -32,6 +32,7 @@ import com.m2brcorp.geostatus.Enum.GeneroEnum;
 import com.m2brcorp.geostatus.Util.DataHoraUtils;
 import com.m2brcorp.geostatus.Util.NetworkUtils;
 import com.m2brcorp.geostatus.Util.ReferenceFB;
+import com.parse.ParseUser;
 
 import java.util.Date;
 
@@ -172,9 +173,17 @@ public class MainActivity extends AppCompatActivity {
 
     private String getAutenticateUser(){
         if(NetworkUtils.isOnline(this)) {
-            FirebaseUser user = fire.getFirebaseAuthReference().getCurrentUser();
-            Log.i("SIMPSONS", user.getEmail());
-            return user.getEmail();
+//            FirebaseUser user = fire.getFirebaseAuthReference().getCurrentUser();
+//            Log.i("SIMPSONS", user.getEmail());
+//            return user.getEmail();
+
+            ParseUser currentUser = ParseUser.getCurrentUser();
+            if (currentUser != null) {
+               return currentUser.getEmail();
+            } else {
+                // show the signup or login screen
+            }
+
         }
         return "";
     }
